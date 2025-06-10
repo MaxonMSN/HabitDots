@@ -1,4 +1,3 @@
-
 // Habit Status: 'pending', 'done', 'missed'
 type HabitDayStatus = 'pending' | 'done' | 'missed';
 
@@ -16,7 +15,9 @@ interface Habit {
 const MAX_DAYS = 7; // Track for 7 days (weekly)
 const HABITS_STORAGE_KEY = 'habitDotsData';
 
-let habits: Habit[] = [];
+// --- CHANGE 1: Initialize habits by calling the loading function directly ---
+// This makes our state initialization robust and centralized.
+let habits: Habit[] = loadHabits();
 
 const newHabitInput = document.getElementById('new-habit-input') as HTMLInputElement;
 const addHabitButton = document.getElementById('add-habit-button') as HTMLButtonElement;
@@ -27,18 +28,27 @@ function saveHabits() {
     localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
 }
 
-function loadHabits() {
+// --- CHANGE 2: Modify loadHabits to ALWAYS return an array ---
+function loadHabits(): Habit[] {
     const storedHabits = localStorage.getItem(HABITS_STORAGE_KEY);
+    
+    // If there are stored habits, parse and validate them.
     if (storedHabits) {
-        habits = JSON.parse(storedHabits);
+        const parsedHabits: Habit[] = JSON.parse(storedHabits);
+        
         // Ensure all habits have the correct number of days, adapting old data if necessary
-        habits.forEach(habit => {
+        parsedHabits.forEach(habit => {
             if (!habit.days || habit.days.length !== MAX_DAYS) {
                 habit.days = Array(MAX_DAYS).fill(null).map(() => ({ status: 'pending' }));
             }
         });
+        return parsedHabits;
     }
+    
+    // If there are no stored habits, return a fresh empty array.
+    return [];
 }
+
 
 function renderHabits() {
     if (!habitsListContainer) return;
@@ -166,9 +176,10 @@ if (resetWeekButton) {
 }
 
 // Initial Load
+// --- CHANGE 3: Simplify the initial load logic ---
 document.addEventListener('DOMContentLoaded', () => {
-    loadHabits();
-    renderHabits();
+    // `habits` is already loaded correctly at the top, so we just need to render.
+    renderHabits(); 
     if (newHabitInput) {
       newHabitInput.focus();
     }
