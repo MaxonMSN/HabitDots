@@ -1,0 +1,5 @@
+{
+  "name": "habitdots",
+  "description": "a minimal habit tracker that shows each habit as a row of colored dots. Green = done, red = missed, grey = pending. Track habits weekly and reset progress to start fresh.",
+  "requestFramePermissions": []
+}
